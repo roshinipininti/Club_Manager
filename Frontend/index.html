@@ -1,0 +1,1428 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Club Management Dashboard</title>
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+      rel="stylesheet"
+    />
+
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      }
+
+      :root {
+        --primary-color: #7c3aed;
+        --secondary-color: #5b21b6;
+        --background-color: #f1f5f9;
+        --text-color: #1e293b;
+        --sidebar-width: 250px;
+      }
+
+      body {
+        background-color: var(--background-color);
+      }
+
+      .container {
+        display: flex;
+        min-height: 100vh;
+      }
+
+      /* Sidebar Styles */
+      .sidebar {
+        width: var(--sidebar-width);
+        background-color: white;
+        padding: 20px;
+        box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+        position: fixed;
+        height: 100vh;
+      }
+
+      .logo {
+        font-size: 24px;
+        font-weight: bold;
+        color: var(--primary-color);
+        margin-bottom: 40px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .nav-item {
+        padding: 12px 15px;
+        margin: 5px 0;
+        border-radius: 8px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        color: var(--text-color);
+        transition: all 0.3s ease;
+      }
+
+      .nav-item:hover {
+        background-color: var(--primary-color);
+        color: white;
+      }
+
+      .nav-item.active {
+        background-color: var(--primary-color);
+        color: white;
+      }
+
+      /* Main Content Styles */
+      .main-content {
+        margin-left: var(--sidebar-width);
+        flex: 1;
+        padding: 20px;
+      }
+
+      .header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 30px;
+        background-color: white;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      }
+
+      .search-bar {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        background-color: var(--background-color);
+        padding: 10px 15px;
+        border-radius: 8px;
+        width: 300px;
+      }
+
+      .search-bar input {
+        border: none;
+        background: none;
+        outline: none;
+        width: 100%;
+      }
+
+      .user-profile {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .user-avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background-color: var(--primary-color);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+      }
+
+      /* Dashboard Cards */
+      .dashboard-cards {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 20px;
+        margin-bottom: 30px;
+      }
+
+      .card {
+        background-color: white;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      }
+
+      .card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 15px;
+      }
+
+      .card-icon {
+        width: 40px;
+        height: 40px;
+        background-color: var(--primary-color);
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+      }
+
+      .card-title {
+        font-size: 14px;
+        color: #64748b;
+      }
+
+      .card-value {
+        font-size: 24px;
+        font-weight: bold;
+        color: var(--text-color);
+      }
+
+      /* Member List Table */
+      .member-list {
+        background-color: white;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      }
+
+      .table-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+      }
+
+      .add-member-btn {
+        background-color: var(--primary-color);
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 8px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        transition: background-color 0.3s ease;
+      }
+
+      .add-member-btn:hover {
+        background-color: var(--secondary-color);
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+
+      th,
+      td {
+        padding: 12px;
+        text-align: left;
+        border-bottom: 1px solid #e2e8f0;
+      }
+
+      th {
+        background-color: #f8fafc;
+        color: #64748b;
+        font-weight: 600;
+      }
+
+      tr:hover {
+        background-color: #f8fafc;
+      }
+
+      .status-badge {
+        padding: 5px 10px;
+        border-radius: 15px;
+        font-size: 12px;
+        font-weight: 500;
+      }
+
+      .status-active,
+      .status-upcoming {
+        background-color: #dcfce7;
+        color: #166534;
+      }
+
+      .status-inactive,
+      .status-cancelled {
+        background-color: #fee2e2;
+        color: #991b1b;
+      }
+
+      .status-completed {
+        background-color: #dbeafe;
+        color: #1d4ed8;
+      }
+
+      .action-buttons {
+        display: flex;
+        gap: 8px;
+      }
+
+      .action-btn {
+        padding: 5px 10px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 14px;
+      }
+
+      .edit-btn {
+        background-color: #ede9fe;
+        color: var(--primary-color);
+      }
+
+      .delete-btn {
+        background-color: #fee2e2;
+        color: #dc2626;
+      }
+
+      /* Modal Styles */
+      .modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        justify-content: center;
+        align-items: center;
+      }
+
+      .modal-content {
+        background-color: white;
+        padding: 30px;
+        border-radius: 10px;
+        width: 500px;
+        max-width: 90%;
+      }
+
+      .modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+      }
+
+      .close-btn {
+        background: none;
+        border: none;
+        font-size: 20px;
+        cursor: pointer;
+        color: #64748b;
+      }
+
+      .form-group {
+        margin-bottom: 15px;
+      }
+
+      .form-group label {
+        display: block;
+        margin-bottom: 5px;
+        color: var(--text-color);
+      }
+
+      .form-group input,
+      .form-group select {
+        width: 100%;
+        padding: 8px;
+        border: 1px solid #e2e8f0;
+        border-radius: 5px;
+        outline: none;
+      }
+
+      .form-group input:focus,
+      .form-group select:focus {
+        border-color: var(--primary-color);
+      }
+
+      .submit-btn {
+        background-color: var(--primary-color);
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 5px;
+        cursor: pointer;
+        width: 100%;
+        margin-top: 20px;
+      }
+
+      .submit-btn:hover {
+        background-color: var(--secondary-color);
+      }
+      .notification {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        padding: 15px 25px;
+        color: white;
+        border-radius: 5px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        z-index: 1000;
+        opacity: 1;
+        transition: opacity 0.5s ease;
+      }
+
+      .notification.success {
+        background-color: #4caf50;
+      }
+      .notification.error {
+        background-color: #f44336;
+      }
+      .notification.warning {
+        background-color: #ff9800;
+      }
+      .notification.info {
+        background-color: #2196f3;
+      }
+
+      .empty-state {
+        text-align: center;
+        padding: 40px 20px;
+        color: #64748b;
+      }
+
+      .empty-state i {
+        font-size: 48px;
+        margin-bottom: 20px;
+        color: #94a3b8;
+      }
+
+      .empty-state h3 {
+        margin-bottom: 10px;
+        color: #1e293b;
+      }
+
+      .event-list,
+      .member-list {
+        background-color: white;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        margin-top: 20px;
+      }
+
+      .section {
+        display: none;
+      }
+
+      .section.active {
+        display: block;
+      }
+
+      .dashboard.active {
+        display: grid;
+      }
+
+      textarea {
+        width: 100%;
+        padding: 8px;
+        border: 1px solid #e2e8f0;
+        border-radius: 5px;
+        resize: vertical;
+        min-height: 100px;
+        font-family: inherit;
+      }
+
+      textarea:focus {
+        border-color: var(--primary-color);
+        outline: none;
+      }
+
+      .loading-spinner {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(255, 255, 255, 0.8);
+        z-index: 1000;
+        justify-content: center;
+        align-items: center;
+      }
+
+      .loading-spinner.active {
+        display: flex;
+      }
+
+      .spinner {
+        width: 50px;
+        height: 50px;
+        border: 5px solid #f3f3f3;
+        border-top: 5px solid var(--primary-color);
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+      }
+
+      @keyframes spin {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <!--Sidebar--->
+      <div class="sidebar">
+        <div class="logo">
+          <i class="fas fa-people-group"></i>
+          ClubManager
+        </div>
+
+        <div class="nav-item active" data-section="dashboard">
+          <i class="fas fa-chart-pie"></i>
+          Dashboard
+        </div>
+        <div class="nav-item" data-section="members">
+          <i class="fas fa-users"></i>
+          Members
+        </div>
+        <div class="nav-item" data-section="events">
+          <i class="fas fa-calendar-days"></i>
+          Events
+        </div>
+        <div class="nav-item" data-section="reports">
+          <i class="fas fa-chart-bar"></i>
+          Reports
+        </div>
+        <div class="nav-item" data-section="settings">
+          <i class="fas fa-cog"></i>
+          Settings
+        </div>
+      </div>
+
+      <!--Main Content-->
+      <div class="main-content">
+        <!-- Header -->
+        <div class="header">
+          <div class="search-bar">
+            <i class="fas fa-search"></i>
+            <input type="text" placeholder="Search members..." />
+          </div>
+          <div class="user-profile">
+            <div class="user-avatar">
+              <i class="fas fa-user"></i>
+            </div>
+            <span>Admin</span>
+          </div>
+        </div>
+
+        <!-- Dashboard Section -->
+        <div id="dashboardSection" class="section dashboard active">
+          <div class="dashboard-cards">
+            <div class="card">
+              <div class="card-header">
+                <div class="card-icon">
+                  <i class="fas fa-users"></i>
+                </div>
+              </div>
+              <div class="card-title">Total Members</div>
+              <div class="card-value">0</div>
+            </div>
+            <div class="card">
+              <div class="card-header">
+                <div class="card-icon">
+                  <i class="fas fa-calendar-check"></i>
+                </div>
+              </div>
+              <div class="card-title">Upcoming Events</div>
+              <div class="card-value">0</div>
+            </div>
+            <div class="card">
+              <div class="card-header">
+                <div class="card-icon">
+                  <i class="fas fa-flag-checkered"></i>
+                </div>
+              </div>
+              <div class="card-title">Completed Events</div>
+              <div class="card-value">0</div>
+            </div>
+            <div class="card">
+              <div class="card-header">
+                <div class="card-icon">
+                  <i class="fas fa-chart-line"></i>
+                </div>
+              </div>
+              <div class="card-title">Completion Rate</div>
+              <div class="card-value">0%</div>
+            </div>
+          </div>
+
+          <!---Member List in Dashboard-->
+          <div class="member-list">
+            <div class="table-header">
+              <h2>Recent Members</h2>
+              <button class="add-member-btn" onclick="openModal()">
+                <i class="fas fa-plus"></i>
+                Add Member
+              </button>
+            </div>
+            <table>
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Name</th>
+                  <th>Role</th>
+                  <th>Join Date</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="memberTableBody">
+                <!-- Will be populated dynamically -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Members Section -->
+        <div id="membersSection" class="section">
+          <div class="member-list">
+            <div class="table-header">
+              <h2>All Members</h2>
+              <button class="add-member-btn" onclick="openModal()">
+                <i class="fas fa-plus"></i>
+                Add Member
+              </button>
+            </div>
+            <table>
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Name</th>
+                  <th>Role</th>
+                  <th>Department</th>
+                  <th>Join Date</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="allMembersTableBody">
+                <!-- Will be populated dynamically -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Events Section -->
+        <div id="eventsSection" class="section">
+          <div class="event-list">
+            <div class="table-header">
+              <h2>Event Management</h2>
+              <button class="add-member-btn" onclick="openEventModal()">
+                <i class="fas fa-plus"></i>
+                Add Event
+              </button>
+            </div>
+            <table>
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Title</th>
+                  <th>Category</th>
+                  <th>Date</th>
+                  <th>Venue</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="eventTableBody">
+                <!-- Will be populated dynamically -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Reports Section -->
+        <div id="reportsSection" class="section">
+          <h2>Reports Coming Soon</h2>
+        </div>
+
+        <!-- Settings Section -->
+        <div id="settingsSection" class="section">
+          <h2>Settings Coming Soon</h2>
+        </div>
+      </div>
+    </div>
+
+    <!-- Member Modal -->
+    <div class="modal" id="memberModal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2 id="modalTitle">Add New Member</h2>
+          <button class="close-btn" onclick="closeModal()">&times;</button>
+        </div>
+        <form id="memberForm">
+          <div class="form-group">
+            <label for="memberName">Full Name</label>
+            <input type="text" id="memberName" required />
+          </div>
+          <div class="form-group">
+            <label for="memberEmail">Email</label>
+            <input type="email" id="memberEmail" required />
+          </div>
+          <div class="form-group">
+            <label for="memberRole">Club Role</label>
+            <select id="memberRole" required>
+              <option value="Member">Member</option>
+              <option value="Event Coordinator">Event Coordinator</option>
+              <option value="Treasurer">Treasurer</option>
+              <option value="Secretary">Secretary</option>
+              <option value="Vice President">Vice President</option>
+              <option value="President">President</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="memberDepartment">Department</label>
+            <input type="text" id="memberDepartment" required placeholder="e.g. Computer Science" />
+          </div>
+          <div class="form-group">
+            <label for="joinDate">Join Date</label>
+            <input type="date" id="joinDate" required />
+          </div>
+          <button type="submit" class="submit-btn">Save Member</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div class="modal" id="deleteConfirmationModal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2>Confirm Deletion</h2>
+          <button class="close-btn" onclick="closeDeleteModal()">
+            &times;
+          </button>
+        </div>
+        <div style="margin: 20px 0">
+          <p>
+            Are you sure you want to delete this item? This action cannot be
+            undone.
+          </p>
+        </div>
+        <div style="display: flex; gap: 10px; justify-content: flex-end">
+          <button
+            class="action-btn"
+            onclick="closeDeleteModal()"
+            style="padding: 8px 16px"
+          >
+            Cancel
+          </button>
+          <button
+            class="action-btn delete-btn"
+            onclick="confirmDelete()"
+            style="padding: 8px 16px"
+          >
+            Delete
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Event Modal -->
+    <div class="modal" id="eventModal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2 id="eventModalTitle">Add New Event</h2>
+          <button class="close-btn" onclick="closeEventModal()">
+            &times;
+          </button>
+        </div>
+        <form id="eventForm">
+          <div class="form-group">
+            <label for="eventTitle">Event Title</label>
+            <input type="text" id="eventTitle" required />
+          </div>
+          <div class="form-group">
+            <label for="eventDescription">Description</label>
+            <textarea id="eventDescription" required rows="3"></textarea>
+          </div>
+          <div class="form-group">
+            <label for="eventCategory">Category</label>
+            <select id="eventCategory" required>
+              <option value="Workshop">Workshop</option>
+              <option value="Seminar">Seminar</option>
+              <option value="Competition">Competition</option>
+              <option value="Cultural">Cultural</option>
+              <option value="Social">Social</option>
+              <option value="Sports">Sports</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="eventDate">Date</label>
+            <input type="date" id="eventDate" required />
+          </div>
+          <div class="form-group">
+            <label for="eventVenue">Venue</label>
+            <input type="text" id="eventVenue" required />
+          </div>
+          <div class="form-group">
+            <label for="eventStatus">Status</label>
+            <select id="eventStatus" required>
+              <option value="upcoming">Upcoming</option>
+              <option value="completed">Completed</option>
+              <option value="cancelled">Cancelled</option>
+            </select>
+          </div>
+          <button type="submit" class="submit-btn">Save Event</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Loading Spinner -->
+    <div class="loading-spinner">
+      <div class="spinner"></div>
+    </div>
+
+    <script>
+      const API_BASE_URL = "http://localhost:3000";
+      let members = [];
+      let events = [];
+      let currentSection = "dashboard";
+      let editingId = null;
+      let editingEventId = null;
+      let deleteType = ""; // 'member' or 'event'
+      let deleteId = null;
+
+      const memberTableBody = document.getElementById("memberTableBody");
+      const allMembersTableBody = document.getElementById(
+        "allMembersTableBody"
+      );
+      const eventTableBody = document.getElementById("eventTableBody");
+      const memberModal = document.getElementById("memberModal");
+      const eventModal = document.getElementById("eventModal");
+      const memberForm = document.getElementById("memberForm");
+      const eventForm = document.getElementById("eventForm");
+      const searchInput = document.querySelector(".search-bar input");
+      const loadingSpinner = document.querySelector(".loading-spinner");
+
+      // Initialize the dashboard
+      document.addEventListener("DOMContentLoaded", async () => {
+        initializeEventListeners();
+        await checkAndLoadData();
+      });
+
+      // Initialize all event listeners
+      function initializeEventListeners() {
+        // Form submissions
+        memberForm.addEventListener("submit", handleFormSubmit);
+        eventForm.addEventListener("submit", handleEventFormSubmit);
+
+        // Search functionality
+        searchInput.addEventListener("input", handleSearch);
+
+        // Navigation
+        document.querySelectorAll(".nav-item").forEach((item) => {
+          item.addEventListener("click", () => {
+            const section = item.dataset.section;
+            navigateToSection(section);
+          });
+        });
+
+        // Modal outside click handlers
+        window.onclick = (event) => {
+          if (event.target === memberModal) closeModal();
+          if (event.target === eventModal) closeEventModal();
+        };
+      }
+
+      // Initial data load
+      async function checkAndLoadData() {
+        showLoading();
+        try {
+          await Promise.all([loadMembers(), loadEvents(), updateDashboardStats()]);
+        } catch (error) {
+          console.error("Error during initialization:", error);
+          showNotification("Error initializing application", "error");
+        } finally {
+          hideLoading();
+        }
+      }
+
+      // Navigation functions
+      function navigateToSection(section) {
+        currentSection = section;
+
+        // Update active nav item
+        document.querySelectorAll(".nav-item").forEach((item) => {
+          item.classList.remove("active");
+          if (item.dataset.section === section) {
+            item.classList.add("active");
+          }
+        });
+
+        // Hide all sections
+        document.querySelectorAll(".section").forEach((section) => {
+          section.classList.remove("active");
+        });
+
+        // Show selected section
+        document.getElementById(`${section}Section`).classList.add("active");
+
+        // Refresh data when switching sections
+        if (section === "events") {
+          loadEvents();
+        } else if (section === "members" || section === "dashboard") {
+          loadMembers();
+          updateDashboardStats();
+        }
+      }
+
+      // API Functions
+      async function updateDashboardStats() {
+        try {
+          const response = await fetch(`${API_BASE_URL}/api/dashboard/stats`);
+          if (!response.ok) throw new Error("Failed to fetch dashboard stats");
+
+          const stats = await response.json();
+
+          // Update dashboard cards
+          document.querySelector(".card:nth-child(1) .card-value").textContent =
+            stats.totalMembers.toLocaleString();
+          document.querySelector(".card:nth-child(2) .card-value").textContent =
+            stats.upcomingEvents.toLocaleString();
+          document.querySelector(".card:nth-child(3) .card-value").textContent =
+            stats.completedEvents.toLocaleString();
+          document.querySelector(
+            ".card:nth-child(4) .card-value"
+          ).textContent = `${stats.completionRate}%`;
+        } catch (error) {
+          console.error("Error updating dashboard stats:", error);
+          showNotification("Error updating statistics", "error");
+        }
+      }
+
+      async function loadMembers() {
+        try {
+          const response = await fetch(`${API_BASE_URL}/api/members`);
+          if (!response.ok) throw new Error("Failed to fetch members");
+
+          members = await response.json();
+          renderMemberTables(members);
+        } catch (error) {
+          console.error("Error loading members:", error);
+          showNotification("Error loading members", "error");
+          members = [];
+          renderMemberTables([]);
+        }
+      }
+
+      async function loadEvents() {
+        try {
+          const response = await fetch(`${API_BASE_URL}/api/events`);
+          if (!response.ok) throw new Error("Failed to fetch events");
+
+          events = await response.json();
+          renderEventTable(events);
+          return events;
+        } catch (error) {
+          console.error("Error loading events:", error);
+          showNotification("Error loading events", "error");
+          events = [];
+          renderEventTable([]);
+        }
+      }
+
+      // CRUD Operations for Members
+      async function createMember(memberData) {
+        const response = await fetch(`${API_BASE_URL}/api/members`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(memberData),
+        });
+
+        if (!response.ok) {
+          const error = await response.json();
+          throw new Error(error.message || "Failed to create member");
+        }
+
+        return response.json();
+      }
+
+      async function updateMember(id, memberData) {
+        const response = await fetch(`${API_BASE_URL}/api/members/${id}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(memberData),
+        });
+
+        if (!response.ok) {
+          const error = await response.json();
+          throw new Error(error.message || "Failed to update member");
+        }
+
+        return response.json();
+      }
+
+      async function deleteMember(id) {
+        deleteType = "member";
+        deleteId = id;
+        document.getElementById("deleteConfirmationModal").style.display =
+          "flex";
+      }
+
+      // CRUD Operations for Events
+      async function createEvent(eventData) {
+        const response = await fetch(`${API_BASE_URL}/api/events`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(eventData),
+        });
+
+        if (!response.ok) {
+          const error = await response.json();
+          throw new Error(error.message || "Failed to create event");
+        }
+
+        return response.json();
+      }
+
+      async function updateEvent(id, eventData) {
+        const response = await fetch(`${API_BASE_URL}/api/events/${id}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(eventData),
+        });
+
+        if (!response.ok) {
+          const error = await response.json();
+          throw new Error(error.message || "Failed to update event");
+        }
+
+        return response.json();
+      }
+
+      async function deleteEvent(id) {
+        deleteType = "event";
+        deleteId = id;
+        document.getElementById("deleteConfirmationModal").style.display =
+          "flex";
+      }
+
+      function closeDeleteModal() {
+        document.getElementById("deleteConfirmationModal").style.display =
+          "none";
+        deleteType = "";
+        deleteId = null;
+      }
+
+      async function confirmDelete() {
+        showLoading();
+        try {
+          if (deleteType === "member") {
+            const response = await fetch(
+              `${API_BASE_URL}/api/members/${deleteId}`,
+              {
+                method: "DELETE",
+              }
+            );
+
+            if (!response.ok) {
+              throw new Error("Failed to delete member");
+            }
+
+            showNotification("Member deleted successfully", "success");
+            await loadMembers();
+            await updateDashboardStats();
+          } else if (deleteType === "event") {
+            const response = await fetch(
+              `${API_BASE_URL}/api/events/${deleteId}`,
+              {
+                method: "DELETE",
+              }
+            );
+
+            if (!response.ok) {
+              const error = await response.json();
+              throw new Error(error.message || "Failed to delete event");
+            }
+
+            showNotification("Event deleted successfully", "success");
+            await loadEvents();
+            await updateDashboardStats();
+          }
+        } catch (error) {
+          console.error("Error during deletion:", error);
+          showNotification(error.message || "Error during deletion", "error");
+        } finally {
+          hideLoading();
+          closeDeleteModal();
+        }
+      }
+
+      // Form Handling
+      async function handleFormSubmit(e) {
+        e.preventDefault();
+        showLoading();
+
+        const memberData = {
+          name: document.getElementById("memberName").value.trim(),
+          email: document.getElementById("memberEmail").value.trim(),
+          role: document.getElementById("memberRole").value,
+          department: document.getElementById("memberDepartment").value.trim(),
+          joinDate: document.getElementById("joinDate").value,
+          status: "active",
+        };
+
+        try {
+          if (editingId) {
+            await updateMember(editingId, memberData);
+            showNotification("Member updated successfully", "success");
+          } else {
+            await createMember(memberData);
+            showNotification("Member created successfully", "success");
+          }
+          closeModal();
+          await loadMembers();
+          await updateDashboardStats();
+        } catch (error) {
+          console.error("Error:", error);
+          showNotification(error.message || "Error saving member data", "error");
+        } finally {
+          hideLoading();
+        }
+      }
+
+      async function handleEventFormSubmit(e) {
+        e.preventDefault();
+        showLoading();
+
+        const eventData = {
+          title: document.getElementById("eventTitle").value.trim(),
+          description: document.getElementById("eventDescription").value.trim(),
+          category: document.getElementById("eventCategory").value,
+          date: document.getElementById("eventDate").value,
+          venue: document.getElementById("eventVenue").value.trim(),
+          status: document.getElementById("eventStatus").value,
+        };
+
+        try {
+          if (editingEventId) {
+            await updateEvent(editingEventId, eventData);
+            showNotification("Event updated successfully", "success");
+          } else {
+            await createEvent(eventData);
+            showNotification("Event created successfully", "success");
+          }
+          closeEventModal();
+          await loadEvents();
+          await updateDashboardStats();
+        } catch (error) {
+          console.error("Error:", error);
+          showNotification(error.message || "Error saving event data", "error");
+        } finally {
+          hideLoading();
+        }
+      }
+
+      // UI Rendering Functions
+      function renderMemberTables(membersToRender) {
+        const tables = [memberTableBody, allMembersTableBody];
+
+        tables.forEach((table) => {
+          if (!table) return; // Skip if table doesn't exist
+
+          const isFullTable = table === allMembersTableBody;
+          table.innerHTML = "";
+
+          if (membersToRender.length === 0) {
+            const colSpan = table
+              .closest("table")
+              .querySelectorAll("th").length;
+            table.innerHTML = `
+                <tr>
+                    <td colspan="${colSpan}" class="empty-state">
+                        <i class="fas fa-users"></i>
+                        <h3>No Members Found</h3>
+                        <p>Click "Add Member" to add your first member</p>
+                    </td>
+                </tr>
+            `;
+            return;
+          }
+
+          membersToRender.forEach((member) => {
+            const row = document.createElement("tr");
+            row.innerHTML = `
+                <td>${member._id}</td>
+                <td>${escapeHtml(member.name)}</td>
+                <td>${escapeHtml(member.role)}</td>
+                ${
+                  isFullTable
+                    ? `<td>${escapeHtml(member.department)}</td>`
+                    : ""
+                }
+                <td>${formatDate(member.joinDate)}</td>
+                <td>
+                    <span class="status-badge status-${member.status}">
+                        ${capitalizeFirstLetter(member.status)}
+                    </span>
+                </td>
+                <td class="action-buttons">
+                    <button class="action-btn edit-btn" onclick="editMember('${
+                      member._id
+                    }')">
+                        <i class="fas fa-edit"></i> Edit
+                    </button>
+                    <button class="action-btn delete-btn" onclick="deleteMember('${
+                      member._id
+                    }')">
+                        <i class="fas fa-trash"></i> Delete
+                    </button>
+                </td>
+            `;
+            table.appendChild(row);
+          });
+        });
+      }
+
+      function renderEventTable(eventsToRender) {
+        eventTableBody.innerHTML = "";
+
+        if (eventsToRender.length === 0) {
+          eventTableBody.innerHTML = `
+            <tr>
+                <td colspan="7" class="empty-state">
+                    <i class="fas fa-calendar-days"></i>
+                    <h3>No Events Found</h3>
+                    <p>Click "Add Event" to schedule your first event</p>
+                </td>
+            </tr>
+        `;
+          return;
+        }
+
+        eventsToRender.forEach((event) => {
+          const row = document.createElement("tr");
+          row.innerHTML = `
+            <td>${event._id}</td>
+            <td>${escapeHtml(event.title)}</td>
+            <td>${escapeHtml(event.category)}</td>
+            <td>${formatDate(event.date)}</td>
+            <td>${escapeHtml(event.venue)}</td>
+            <td>
+                <span class="status-badge status-${event.status}">
+                    ${capitalizeFirstLetter(event.status)}
+                </span>
+            </td>
+            <td class="action-buttons">
+                <button class="action-btn edit-btn" onclick="editEvent('${
+                  event._id
+                }')">
+                    <i class="fas fa-edit"></i> Edit
+                </button>
+                <button class="action-btn delete-btn" onclick="deleteEvent('${
+                  event._id
+                }')">
+                    <i class="fas fa-trash"></i> Delete
+                </button>
+            </td>
+        `;
+          eventTableBody.appendChild(row);
+        });
+      }
+
+      // Modal Operations
+      function openModal() {
+        memberModal.style.display = "flex";
+        editingId = null;
+        memberForm.reset();
+        document.getElementById("modalTitle").textContent = "Add New Member";
+      }
+
+      function closeModal() {
+        memberModal.style.display = "none";
+        editingId = null;
+        memberForm.reset();
+      }
+
+      function openEventModal() {
+        eventModal.style.display = "flex";
+        editingEventId = null;
+        eventForm.reset();
+        document.getElementById("eventModalTitle").textContent =
+          "Add New Event";
+      }
+
+      function closeEventModal() {
+        eventModal.style.display = "none";
+        editingEventId = null;
+        eventForm.reset();
+      }
+
+      // Update the editMember function
+      async function editMember(id) {
+        showLoading();
+        try {
+          const response = await fetch(`${API_BASE_URL}/api/members/${id}`);
+          if (!response.ok) {
+            const error = await response.json();
+            throw new Error(error.message || "Failed to fetch member");
+          }
+
+          const member = await response.json();
+
+          editingId = id;
+          document.getElementById("modalTitle").textContent = "Edit Member";
+          document.getElementById("memberName").value = member.name;
+          document.getElementById("memberEmail").value = member.email;
+          document.getElementById("memberRole").value = member.role;
+          document.getElementById("memberDepartment").value = member.department;
+          document.getElementById("joinDate").value = formatDateForInput(
+            member.joinDate
+          );
+
+          memberModal.style.display = "flex";
+        } catch (error) {
+          console.error("Error loading member for edit:", error);
+          showNotification(
+            error.message || "Error loading member data",
+            "error"
+          );
+        } finally {
+          hideLoading();
+        }
+      }
+
+      // Update the editEvent function
+      async function editEvent(id) {
+        showLoading();
+        try {
+          const response = await fetch(`${API_BASE_URL}/api/events/${id}`);
+          if (!response.ok) {
+            const error = await response.json();
+            throw new Error(error.message || "Failed to fetch event");
+          }
+
+          const event = await response.json();
+
+          editingEventId = id;
+          document.getElementById("eventModalTitle").textContent = "Edit Event";
+          document.getElementById("eventTitle").value = event.title;
+          document.getElementById("eventDescription").value = event.description;
+          document.getElementById("eventCategory").value = event.category;
+          document.getElementById("eventDate").value = formatDateForInput(
+            event.date
+          );
+          document.getElementById("eventVenue").value = event.venue;
+          document.getElementById("eventStatus").value = event.status;
+
+          eventModal.style.display = "flex";
+        } catch (error) {
+          console.error("Error loading event for edit:", error);
+          showNotification(
+            error.message || "Error loading event data",
+            "error"
+          );
+        } finally {
+          hideLoading();
+        }
+      }
+
+      // Search Functionality
+      let searchTimeout;
+      function handleSearch(e) {
+        clearTimeout(searchTimeout);
+        const searchTerm = e.target.value.trim();
+
+        searchTimeout = setTimeout(async () => {
+          if (searchTerm.length === 0) {
+            await loadMembers();
+            return;
+          }
+
+          showLoading();
+          try {
+            const response = await fetch(
+              `${API_BASE_URL}/api/members/search?q=${encodeURIComponent(
+                searchTerm
+              )}`
+            );
+            if (!response.ok) throw new Error("Search failed");
+
+            const filteredMembers = await response.json();
+            renderMemberTables(filteredMembers);
+          } catch (error) {
+            console.error("Error searching members:", error);
+            showNotification("Error searching members", "error");
+          } finally {
+            hideLoading();
+          }
+        }, 300); // Debounce search requests
+      }
+
+      // Utility Functions
+      function formatDate(dateString) {
+        const options = { year: "numeric", month: "short", day: "numeric" };
+        return new Date(dateString).toLocaleDateString(undefined, options);
+      }
+
+      function formatDateForInput(dateString) {
+        return new Date(dateString).toISOString().split("T")[0];
+      }
+
+      function capitalizeFirstLetter(string) {
+        if (!string) return "";
+        return string.charAt(0).toUpperCase() + string.slice(1);
+      }
+
+      function escapeHtml(unsafe) {
+        if (!unsafe) return "";
+        return unsafe
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(/"/g, "&quot;")
+          .replace(/'/g, "&#039;");
+      }
+
+      // Loading Spinner Functions
+      function showLoading() {
+        document.querySelector(".loading-spinner").classList.add("active");
+      }
+
+      function hideLoading() {
+        document.querySelector(".loading-spinner").classList.remove("active");
+      }
+
+      // Notification System
+      function showNotification(message, type = "info") {
+        // Remove any existing notifications
+        const existingNotifications =
+          document.querySelectorAll(".notification");
+        existingNotifications.forEach((notification) => notification.remove());
+
+        // Create new notification
+        const notification = document.createElement("div");
+        notification.className = `notification ${type}`;
+        notification.textContent = message;
+
+        // Add notification to the document
+        document.body.appendChild(notification);
+
+        // Remove notification after delay
+        setTimeout(() => {
+          notification.style.opacity = "0";
+          setTimeout(() => notification.remove(), 500);
+        }, 3000);
+      }
+
+      // Error Handler
+      function handleError(error, defaultMessage = "An error occurred") {
+        console.error(error);
+        showNotification(error.message || defaultMessage, "error");
+      }
+
+      // Update modal close handlers
+      window.onclick = (event) => {
+        if (event.target === memberModal) closeModal();
+        if (event.target === eventModal) closeEventModal();
+        if (event.target === document.getElementById("deleteConfirmationModal"))
+          closeDeleteModal();
+      };
+    </script>
+  </body>
+</html>
